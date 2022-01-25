@@ -3,3 +3,5 @@
 .env
 models/test*.js
 /old
+/variants
+routes/Untitled-1.swift
