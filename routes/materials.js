@@ -161,15 +161,14 @@ router.post('/',
  *   put:
  *     summary: Изменение существующего материала по имени
  *     parameters:
- *      - in: path
- *        name: name
- *        schema:
- *          type: string
- *          format: uri
- *        required: true
- *        description: Наименование материала (url-encoded)
- *         example:
- *           name: %D0%9C%D0%BE%D0%BD%D1%82%D0%B0%D0%B6%20LED%20%D0%BF%D0%BE%D0%B4%D1%81%D0%B2%D0%B5%D1%82%D0%BA%D0%B8
+ *       - in: path
+ *         name: name
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Наименование материала (url-encoded)
+ *     example:
+ *     name: %D0%9C%D0%BE%D0%BD%D1%82%D0%B0%D0%B6%20LED%20%D0%BF%D0%BE%D0%B4%D1%81%D0%B2%D0%B5%D1%82%D0%BA%D0%B8
  *     requestBody:
  *       required: true
  *       content:
