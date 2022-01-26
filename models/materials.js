@@ -4,6 +4,7 @@ const { Schema } = mongoose
 
 const Material = new Schema({
   name: String,
+  purpose: String,
   type: String,
   category: String,
   unit: String,
