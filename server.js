@@ -12,6 +12,7 @@ import swaggerJsDoc from 'swagger-jsdoc'
 import swaggerUI from 'swagger-ui-express'
 
 import routerMaterials from './routes/materials.js'
+import routerEstimates from './routes/estimates.js'
 
 const port = process.env.PORT || 3001
 
@@ -48,6 +49,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 app.use('/materials', routerMaterials)
+app.use('/estimates', routerEstimates)
 
 app.listen(port, () => {
   console.log(`Backend server started on port ${port}...`)

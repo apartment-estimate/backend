@@ -2,8 +2,16 @@ import { db } from '../db.js'// eslint-disable-line no-unused-vars
 import materials from '../models/materials.js'
 
 export async function createMaterial (request) {
-  if (!request.name) {
+  if (!request.name || !request.purpose) {
     return { status: 400, message: 'Отсутствует имя материала и/или назначение (basic/auxiliary)', material: undefined }
+  }
+
+  const material = await materials.findOne({ name: request.name })
+    .catch(e => {
+      console.log('Ошибка БД: createMaterial(): find(): ', e)
+    })
+  if (material) {
+    return { status: 406, message: 'Такой материал уже есть', material: material.toObject() }
   }
 
   const result = await materials.insertMany(request)
@@ -11,7 +19,7 @@ export async function createMaterial (request) {
       console.log('Ошибка БД: createMaterial(): insertMany(): ', e)
     })
   if (result) {
-    return { status: 200, message: `Материал ${request.name} успешно сохранен`, material: result.toObject() }
+    return { status: 200, message: `Материал ${request.name} успешно сохранен`, material: result[0].toObject() }
   } else {
     return { status: 500, message: `Не удалось сохранить материал: ${request.name}` }
   }
@@ -42,7 +50,7 @@ export async function updateMaterial (name, request) {
 export async function deleteMaterial (name) {
   const material = await materials.findOneAndDelete({ name: name })
     .catch(e => {
-      console.log('Ошибка БД: updateMaterial(): find(): ', e)
+      console.log('Ошибка БД: deleteMaterial(): find(): ', e)
     })
 
   if (!material) {
@@ -62,7 +70,7 @@ export async function getMaterials (search, purpose) {
 
   const materialsArray = await materials.find(filter).lean()
     .catch(e => {
-      console.log('Ошибка БД: updateMaterial(): find(): ', e)
+      console.log('Ошибка БД: getMaterials(): find(): ', e)
     })
 
   return { status: 200, message: 'OK', materials: materialsArray }

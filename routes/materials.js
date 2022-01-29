@@ -39,73 +39,23 @@ export default router
  *         category: Электрика
  *         unit: шт
  *         priceNet: 3360.00
- *     Estimate:
- *       type: object
- *       required:
- *         - name
- *       properties:
- *         name:
- *           type: string
- *           description: Наименование сметы
- *         date:
- *           type: string
- *           description: Дата составления сметы
- *         customer:
- *           type: string
- *           description: Покупатель/Клиент
- *         residence:
- *           type: string
- *           description: Жилой комплекс
- *         layout:
- *           type: string
- *           description: Тип планировки
- *         style:
- *           type: string
- *           description: Стиль планировки
- *         coeffCommon:
- *           type: number
- *           description: Повышающий коэффициент для всей сметы
- *         items:
- *           type: array
- *           description: Массив строк сметы
- *           items:
- *             allOf:
- *               - $ref: '#components/schemas/Material'
- *               - type: object
- *                 properties:
- *                   stage:
- *                     type: string
- *                     description: Этап проведения строительных работ
- *                   amount:
- *                     type: number
- *                     description: Количество основного материала
- *                   priceTotal:
- *                     type: number
- *                     description: Цена на основной маиериал с учетом вспомогательных
- *                   coeffIndividual:
- *                     type: number
- *                     description: Индивидуальный повышающий коэффициент для основного материала
- *                   auxiliary:
- *                     type: array
- *                     description: Массив вспомогательных материалов
- *                     items:
- *                       allOf:
- *                         - $ref: '#components/schemas/Material'
- *                         - type: object
- *                           properties:
- *                             amount:
- *                               type: number
- *                               description: Количество вспомогательного материала
- *         total:
- *           type: number
- *           description: Общая сумма сметы
 */
+
+/**
+  * @swagger
+  * tags:
+  *   - name: materials
+  *     description: Используемые материалы
+  *   - name: estimates
+  *     description: Создаваемые сметы
+  */
 
 /**
  * @swagger
  * /materials:
  *   post:
  *     summary: Добавление нового материала
+ *     tags: [materials]
  *     requestBody:
  *       required: true
  *       content:
@@ -157,6 +107,23 @@ export default router
  *                   type: string
  *               example:
  *                 message: Отсутствует имя материала
+ *       406:
+ *         description: Такой материал уже есть
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 message: Такой материал уже есть
+ *                 material:
+ *                   name: Монтаж LED подсветки
+ *                   purpose: basic
+ *                   category: Электрика
+ *                   unit: шт
+ *                   priceNet: 4000
  *       500:
  *         description: Не удалось сохранить материал
  *         content:
@@ -175,13 +142,13 @@ router.post('/',
     try {
       console.log('User wants to add new material')
       const result = await createMaterial(req.body)
-      if (result) {
+      if (result.status === 200) {
         res.status(200).json({ message: result.message, material: result.material })
       } else {
         res.status(result.status).json({ error: result.message })
       }
     } catch (error) {
-      console.log('Unsuccessful POST/material request: ', error)
+      console.log('Unsuccessful POST/materials request: ', error)
       return next(error)
     }
   }
@@ -192,6 +159,7 @@ router.post('/',
  * /materials/{name}:
  *   put:
  *     summary: Изменение существующего материала по имени
+ *     tags: [materials]
  *     parameters:
  *       - in: path
  *         name: name
@@ -212,7 +180,7 @@ router.post('/',
  *             priceNet: 3000.00
  *     responses:
  *       200:
- *         description: Новый материал успешно изменен
+ *         description: Материал успешно изменен
  *         content:
  *           application/json:
  *             schema:
@@ -285,7 +253,7 @@ router.put('/:name',
         res.status(result.status).json({ error: result.message })
       }
     } catch (error) {
-      console.log('Unsuccessful POST/material request: ', error)
+      console.log('Unsuccessful POST/materials request: ', error)
       return next(error)
     }
   }
@@ -296,6 +264,7 @@ router.put('/:name',
  * /materials/{name}:
  *   delete:
  *     summary: Удаление существующего материала по имени
+ *     tags: [materials]
  *     parameters:
  *       - in: path
  *         name: name
@@ -371,7 +340,7 @@ router.delete('/:name',
         res.status(result.status).json({ error: result.message })
       }
     } catch (error) {
-      console.log('Unsuccessful POST/material request: ', error)
+      console.log('Unsuccessful POST/materials request: ', error)
       return next(error)
     }
   }
@@ -382,6 +351,7 @@ router.delete('/:name',
  * /materials:
  *   get:
  *     summary: Выдача материалов по критерию поиска
+ *     tags: [materials]
  *     parameters:
  *       - in: query
  *         name: search
@@ -440,7 +410,7 @@ router.get('/',
         res.status(result.status).json({ error: result.message })
       }
     } catch (error) {
-      console.log('Unsuccessful POST/material request: ', error)
+      console.log('Unsuccessful POST/materials request: ', error)
       return next(error)
     }
   }
