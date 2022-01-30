@@ -70,5 +70,40 @@ export async function getEstimates (search) {
       console.log('Ошибка БД: getEstimates(): find(): ', e)
     })
 
+  estimatesArray.forEach(estimate => {
+    if (Array.isArray(estimate.items)) {
+      estimate.items.forEach(item => {
+        setPriceTotal(item)
+        setAuxiliary(item)
+        item.type = 'basic'
+      })
+    }
+    setTotal(estimate)
+  })
+
   return { status: 200, message: 'OK', estimates: estimatesArray }
+}
+
+function setTotal (estimate) {
+  estimate.total =
+      (!Array.isArray(estimate.items))
+        ? 0
+        : estimate.items.reduce((total, item) => total + item.PriceTotal * item.amount, 0)
+}
+
+function setPriceTotal (item) {
+  item.PriceTotal = item.priceNet +
+    (
+      (!Array.isArray(item.auxiliary))
+        ? 0
+        : item.auxiliary.reduce((total, aux) => total + aux.priceNet * aux.amount, 0)
+    )
+}
+
+function setAuxiliary (item) {
+  if (Array.isArray(item.auxiliary)) {
+    item.auxiliary.forEach(aux => {
+      aux.type = 'auxiliary'
+    })
+  }
 }
