@@ -14,6 +14,16 @@ export async function createEstimate (request) {
     return { status: 406, message: 'Такая смета уже есть', estimate: estimate.toObject() }
   }
 
+  if (!request.coeffCommon) {
+    request.coeffCommon = 1.0
+  }
+  if (Array.isArray(request.items)) {
+    request.items.forEach(item => {
+      if (!item.coeffIndividual) {
+        item.coeffIndividual = 1.0
+      }
+    })
+  }
   const result = await estimates.insertMany(request)
     .catch(e => {
       console.log('Ошибка БД: createEstimate(): insertMany(): ', e)
@@ -75,7 +85,7 @@ export async function getEstimates (search) {
       estimate.items.forEach(item => {
         setPriceTotal(item)
         setAuxiliary(item)
-        item.type = 'basic'
+        item.purpose = 'basic'
       })
     }
     setTotal(estimate)
@@ -88,7 +98,9 @@ function setTotal (estimate) {
   estimate.total =
       (!Array.isArray(estimate.items))
         ? 0
-        : estimate.items.reduce((total, item) => total + item.PriceTotal * item.amount, 0)
+        : estimate.items.reduce((total, item) =>
+          total + item.PriceTotal * item.amount * item.coeffIndividual, 0)
+  estimate.total *= estimate.coeffCommon
 }
 
 function setPriceTotal (item) {
@@ -103,7 +115,7 @@ function setPriceTotal (item) {
 function setAuxiliary (item) {
   if (Array.isArray(item.auxiliary)) {
     item.auxiliary.forEach(aux => {
-      aux.type = 'auxiliary'
+      aux.purpose = 'auxiliary'
     })
   }
 }

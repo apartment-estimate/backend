@@ -14,7 +14,9 @@ const Estimates = new Schema({
   items: [
     {
       name: String,
+      category: String,
       stage: String,
+      unit: String,
       priceNet: Number,
       priceTotal: Number,
       amount: Number,
@@ -22,6 +24,9 @@ const Estimates = new Schema({
       auxiliary: [
         {
           name: String,
+          category: String,
+          unit: String,
+          priceNet: Number,
           amount: Number
         }
       ]
