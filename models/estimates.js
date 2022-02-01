@@ -10,7 +10,7 @@ const Estimates = new Schema({
   layout: String,
   style: String,
   coeffCommon: Number,
-  total: Number,
+  totalEstimate: Number,
   items: [
     {
       name: String,
@@ -18,7 +18,6 @@ const Estimates = new Schema({
       stage: String,
       unit: String,
       priceNet: Number,
-      priceTotal: Number,
       amount: Number,
       coeffIndividual: Number,
       auxiliary: [

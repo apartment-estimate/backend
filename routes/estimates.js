@@ -52,9 +52,6 @@ export default router
  *                   amount:
  *                     type: number
  *                     description: Количество основного материала
- *                   priceTotal:
- *                     type: number
- *                     description: Цена на основной маиериал с учетом вспомогательных
  *                   coeffIndividual:
  *                     type: number
  *                     description: Индивидуальный повышающий коэффициент для основного материала
@@ -69,7 +66,7 @@ export default router
  *                             amount:
  *                               type: number
  *                               description: Количество вспомогательного материала
- *         total:
+ *         totalEstimate:
  *           type: number
  *           description: Общая сумма сметы
  *   examples:
@@ -82,13 +79,12 @@ export default router
  *         layot: 2x комнатная квартира
  *         style: Классический
  *         coeffCommon: 1.2
- *         total: 42000
+ *         totalEstimate: 42000
  *         items: [{
  *           name: Монтаж LED подсветки,
  *           purpose: basic,
  *           stage: Чистовая отделка,
  *           priceNet: 4000,
- *           priceTotal: 4200,
  *           amount: 10,
  *           coeffIndividual: 1.0,
  *             auxiliary: [{
@@ -141,13 +137,12 @@ export default router
  *                   layot: 2x комнатная квартира
  *                   style: Классический
  *                   coeffCommon: 1.2
- *                   total: 42000
+ *                   totalEstimate: 42000
  *                   items: [{
  *                     name: Монтаж LED подсветки,
  *                     purpose: basic,
  *                     stage: Чистовая отделка,
  *                     priceNet: 4000,
- *                     priceTotal: 4200,
  *                     amount: 10,
  *                     coeffIndividual: 1.0,
  *                       auxiliary: [{
@@ -258,13 +253,12 @@ router.post('/',
  *                   layot: 2x комнатная квартира
  *                   style: Классический
  *                   coeffCommon: 1.2
- *                   total: 42000
+ *                   totalEstimate: 42000
  *                   items: [{
  *                     name: Монтаж LED подсветки,
  *                     purpose: basic,
  *                     stage: Чистовая отделка,
  *                     priceNet: 4000,
- *                     priceTotal: 4200,
  *                     amount: 10,
  *                     coeffIndividual: 1.0,
  *                       auxiliary: [{
@@ -443,9 +437,61 @@ router.delete('/:name',
  *               type: array
  *               description: Массив смет, соответствующих критерию поиска
  *               items:
- *                 $ref: '#components/schemas/Estimate'
+ *                 allOf:
+ *                   - $ref: '#components/schemas/Estimate'
+ *                   - type: object
+ *                     properties:
+ *                       items:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             priceBrutto:
+ *                               type: number
+ *                               description: Цена на основной маиериал с учетом вспомогательных
+ *                             totalNet:
+ *                               type: number
+ *                               description: Сумма на основной материал без учета вспомогательных
+ *                             totalBrutto:
+ *                               type: number
+ *                               description: Сумма на основной материал с учетом вспомогательных
+ *                             auxiliary:
+ *                               type: array
+ *                               items:
+ *                                 type: object
+ *                                 properties:
+ *                                   totalNet:
+ *                                     type: number
+ *                                     description: Сумма на вспомогательных материал
+ *               example: [{
+ *                 name: Типовая смета,
+ *                 date: Fri Jan 28 2022 10:43:26 GMT+0300 (Moscow Standard Time),
+ *                 residence: ЖК Алые Паруса,
+ *                 customer: Конрад Карлович Михельсон,
+ *                 layot: 2x комнатная квартира,
+ *                 style: Классический,
+ *                 coeffCommon: 1.2,
+ *                 totalEstimate: 42000,
+ *                 items: [{
+ *                   name: Монтаж LED подсветки,
+ *                   purpose: basic,
+ *                   stage: Чистовая отделка,
+ *                   priceNet: 4000,
+ *                   priceBrutto: 4020,
+ *                   totalNet: 40000,
+ *                   totalBrutto: 40200,
+ *                   amount: 10,
+ *                   coeffIndividual: 1.0,
+ *                     auxiliary: [{
+ *                       name: Скрепки,
+ *                       unit: шт,
+ *                       priceNet: 20,
+ *                       totalNet: 200,
+ *                       amount: 10
+ *                   }]
+ *                 }]
+ *               }]
  */
-
 router.get('/',
   async (req, res, next) => {
     try {

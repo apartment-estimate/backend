@@ -83,32 +83,43 @@ export async function getEstimates (search) {
   estimatesArray.forEach(estimate => {
     if (Array.isArray(estimate.items)) {
       estimate.items.forEach(item => {
-        setPriceTotal(item)
         setAuxiliary(item)
+        setTotalAux(item)
+        setPriceBrutto(item)
         item.purpose = 'basic'
+        item.totalNet = item.priceNet * item.amount
+        item.totalBrutto = item.priceBrutto * item.amount
       })
     }
-    setTotal(estimate)
+    setTotalEstimate(estimate)
   })
 
   return { status: 200, message: 'OK', estimates: estimatesArray }
 }
 
-function setTotal (estimate) {
-  estimate.total =
+function setTotalAux (item) {
+  if (Array.isArray(item.auxiliary)) {
+    item.auxiliary.forEach(aux => {
+      aux.totalNet = aux.priceNet * aux.amount
+    })
+  }
+}
+
+function setTotalEstimate (estimate) {
+  estimate.totalEstimate =
       (!Array.isArray(estimate.items))
         ? 0
         : estimate.items.reduce((total, item) =>
-          total + item.PriceTotal * item.amount * item.coeffIndividual, 0)
-  estimate.total *= estimate.coeffCommon
+          total + item.priceBrutto * item.amount * item.coeffIndividual, 0)
+  estimate.totalEstimate *= estimate.coeffCommon
 }
 
-function setPriceTotal (item) {
-  item.PriceTotal = item.priceNet +
+function setPriceBrutto (item) {
+  item.priceBrutto = item.priceNet +
     (
       (!Array.isArray(item.auxiliary))
         ? 0
-        : item.auxiliary.reduce((total, aux) => total + aux.priceNet * aux.amount, 0)
+        : item.auxiliary.reduce((total, aux) => total + aux.priceNet * aux.amount, 0) / item.amount
     )
 }
 
